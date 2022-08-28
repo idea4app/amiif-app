@@ -7,12 +7,10 @@ import Page from '/lib/page'
 export default function Home({ user }) {
   return (
     <Page user={user}>
-      <Grid height="100vh" placeContent="center">
-        <Flex direction="column" textAlign="center">
-          <Heading>AMIIF App</Heading>
-          <Heading size="lg">In progress section</Heading>
-        </Flex>
-      </Grid>
+      <Flex direction="column" textAlign="center">
+        <Heading>AMIIF App</Heading>
+        <Heading size="lg">In progress section</Heading>
+      </Flex>
     </Page>
   )
 }

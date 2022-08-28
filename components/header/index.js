@@ -7,10 +7,12 @@ import {
   Icon,
   Text,
   Image,
+  Input,
   Button,
   Drawer,
   Popover,
   DrawerBody,
+  InputGroup,
   PopoverArrow,
   DrawerHeader,
   DrawerOverlay,
@@ -20,8 +22,10 @@ import {
   useDisclosure,
   PopoverTrigger,
   PopoverContent,
+  InputLeftElement,
   DrawerCloseButton,
   PopoverCloseButton,
+  useColorModeValue,
 } from '@chakra-ui/react'
 import {
   IoCash,
@@ -30,7 +34,7 @@ import {
   IoCarSportSharp,
 } from 'react-icons/io5'
 import { FcDocument } from 'react-icons/fc'
-import { FaBoxes, FaUserAlt, FaAlignJustify } from 'react-icons/fa'
+import { FaBoxes, FaSearch, FaUserAlt, FaAlignJustify } from 'react-icons/fa'
 
 import { fetcher } from '/utils'
 import { httpStatus } from '/constants'
@@ -45,9 +49,11 @@ const routes = [
 ]
 
 export default function Header({ user }) {
+  const btnRef = useRef()
   const router = useRouter()
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const btnRef = useRef()
+
+  const background = useColorModeValue('gray.300', 'gray.700')
 
   const handleLogout = async () => {
     const request = await fetcher('/api/logout', { method: 'POST' })
@@ -57,10 +63,13 @@ export default function Header({ user }) {
     }
   }
 
-  console.log({ user })
-
   return (
-    <Flex padding="20px" background="gray.700" justifyContent="space-between">
+    <Flex
+      boxShadow="lg"
+      padding="10px 20px"
+      background={background}
+      justifyContent="space-between"
+    >
       <Flex>
         <Button mr="5" ref={btnRef} colorScheme="gray" onClick={onOpen}>
           <Icon w="5" h="5" as={FaAlignJustify} />
@@ -73,6 +82,19 @@ export default function Header({ user }) {
             src="/images/logo-amiif-border.png"
           />
         </NextLink>
+      </Flex>
+      <Flex flex="1" p="0 100px">
+        <InputGroup>
+          <InputLeftElement>
+            <Icon color="blue.400" w="5" h="5" as={FaSearch} />
+          </InputLeftElement>
+          <Input
+            type="text"
+            rounded="full"
+            variant="filled"
+            placeholder="Buscar..."
+          />
+        </InputGroup>
       </Flex>
       <Flex>
         <Popover>
@@ -95,8 +117,8 @@ export default function Header({ user }) {
           </PopoverContent>
         </Popover>
       </Flex>
-
       <Drawer
+        size="xs"
         isOpen={isOpen}
         placement="left"
         onClose={onClose}
@@ -119,11 +141,11 @@ export default function Header({ user }) {
             <Flex direction="column">
               {routes.map(route => {
                 return (
-                  <NextLink key={route.name} href={route.path} passHref>
+                  <NextLink key={route.name} href={route.path}>
                     <Button
                       mb="4"
                       rounded="full"
-                      variant="solid"
+                      colorScheme="blue"
                       disabled={route.disabled}
                       leftIcon={<Icon w="5" h="5" as={route.icon} />}
                     >
