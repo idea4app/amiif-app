@@ -1,6 +1,8 @@
 import { Flex, Grid, Heading } from '@chakra-ui/react'
 
-export default function Home() {
+import { getLoggedUser } from '/lib/session'
+
+export default function Home({ user }) {
   return (
     <Grid height="100vh" placeContent="center">
       <Flex direction="column" textAlign="center">
@@ -9,4 +11,23 @@ export default function Home() {
       </Flex>
     </Grid>
   )
+}
+
+export const getServerSideProps = async ({ req }) => {
+  const user = await getLoggedUser(req)
+
+  if (!user) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {
+      user,
+    },
+  }
 }
