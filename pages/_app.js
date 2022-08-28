@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { ChakraProvider } from '@chakra-ui/react'
 
 export default function MyApp({ Component, pageProps }) {
@@ -6,4 +7,9 @@ export default function MyApp({ Component, pageProps }) {
       <Component {...pageProps} />
     </ChakraProvider>
   )
+}
+
+MyApp.propTypes = {
+  Component: PropTypes.element,
+  pageProps: PropTypes.shape({}),
 }

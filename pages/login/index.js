@@ -85,6 +85,7 @@ export default function Login() {
           height="60px"
           loading="lazy"
           margin="0 auto"
+          alt="AMIIF logo"
           src="/images/logo-amiif-border.png"
         />
         <Heading mb="5" mt="5" textAlign="center" size="lg">

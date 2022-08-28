@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { Flex, Grid, Heading } from '@chakra-ui/react'
 
 import { getLoggedUser } from '/lib/session'
@@ -30,4 +31,11 @@ export const getServerSideProps = async ({ req }) => {
       user,
     },
   }
+}
+
+Home.propTypes = {
+  user: PropTypes.shape({
+    email: PropTypes.string,
+    type: PropTypes.string,
+  }),
 }
