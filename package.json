@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "peerDependencies": {
+    "@chakra-ui/system": "2.2.7"
+  },
   "dependencies": {
     "@chakra-ui/icons": "2.0.9",
     "@chakra-ui/react": "2.2.9",
@@ -26,6 +29,8 @@
   },
   "devDependencies": {
     "eslint": "8.23.0",
-    "eslint-config-next": "12.2.5"
+    "eslint-config-next": "12.2.5",
+    "eslint-config-prettier": "^8.5.0",
+    "standard": "^17.0.0"
   }
 }
