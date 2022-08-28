@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types'
 import { Flex, Grid, Heading } from '@chakra-ui/react'
 
-import Page from '/lib/page'
 import { getLoggedUser } from '/lib/session'
+import Page from '/lib/page'
 
 export default function Home({ user }) {
   return (
