@@ -11,6 +11,7 @@ import {
   Input,
   Image,
   Button,
+  Spacer,
   Heading,
   FormLabel,
   InputGroup,
@@ -19,7 +20,7 @@ import {
   InputLeftElement,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { FaLock, FaEnvelope } from 'react-icons/fa'
+import { FaLock, FaEnvelope, FaUserCircle } from 'react-icons/fa'
 
 import { fetcher } from '/utils'
 import { httpStatus } from '/constants'
@@ -37,24 +38,34 @@ export default function Login() {
   const boxBackground = useColorModeValue('gray.50', 'gray.700')
   const loginBackground = useColorModeValue('gray.200', 'gray.800')
 
-  async function onSubmit({ email, password }) {
-    const request = await fetcher('/api/login', {
+  async function onSubmit({
+    email,
+    password,
+    firstname,
+    maternalSurname,
+    paternalSurname,
+  }) {
+    const request = await fetcher('/api/register', {
       method: 'POST',
       body: JSON.stringify({
         email,
         password,
+        firstname,
+        maternalSurname,
+        paternalSurname,
       }),
     })
 
-    if (request.status === httpStatus.HTTP_200_OK) {
+    if (request.status === httpStatus.HTTP_201_CREATED) {
       router.push('/')
-    } else if (request.status === httpStatus.HTTP_403_FORBIDDEN) {
-      const customError = {
-        type: 'credentials',
-        message: 'Credenciales inválidas',
-      }
-      setError('email', customError)
-      setError('password', customError)
+    } else if (request.status === httpStatus.HTTP_409_CONFLICT) {
+      setError('email', {
+        message: 'Email existente o inválido',
+      })
+    } else if (request.status === httpStatus.HTTP_400_BAD_REQUEST) {
+      setError('passoword', {
+        message: 'Contraseña insegura',
+      })
     }
   }
 
@@ -83,9 +94,66 @@ export default function Login() {
           src="/images/logo-amiif-border.png"
         />
         <Heading mb="5" mt="5" textAlign="center" size="lg">
-          Inicia sesión
+          Crea tu cuenta
         </Heading>
         <form onSubmit={handleSubmit(onSubmit)}>
+          <FormControl isInvalid={errors.firstname} mb="6">
+            <FormLabel htmlFor="firstname">Nombre</FormLabel>
+            <InputGroup>
+              <Input
+                id="firstname"
+                placeholder="Ingresa tu nombre"
+                {...register('firstname', {
+                  required: 'Nombre es requerido',
+                })}
+              />
+              <InputLeftElement>
+                <Icon color="blue.400" w="5" h="5" as={FaUserCircle} />
+              </InputLeftElement>
+            </InputGroup>
+            <FormErrorMessage>
+              {errors.firstname && errors.firstname.message}
+            </FormErrorMessage>
+          </FormControl>
+          <Flex mb="6">
+            <FormControl isInvalid={errors.paternalSurname} mr="6">
+              <FormLabel htmlFor="paternalSurname">Apellido paterno</FormLabel>
+              <InputGroup>
+                <Input
+                  id="paternalSurname"
+                  placeholder="Apellido paterno"
+                  {...register('paternalSurname', {
+                    required: 'Apellido paterno es requerido',
+                  })}
+                />
+                <InputLeftElement>
+                  <Icon color="blue.400" w="5" h="5" as={FaUserCircle} />
+                </InputLeftElement>
+              </InputGroup>
+              <FormErrorMessage>
+                {errors.paternalSurname && errors.paternalSurname.message}
+              </FormErrorMessage>
+            </FormControl>
+            <Spacer />
+            <FormControl isInvalid={errors.maternalSurname}>
+              <FormLabel htmlFor="maternalSurname">Apellido materno</FormLabel>
+              <InputGroup>
+                <Input
+                  id="maternalSurname"
+                  placeholder="Apellido materno"
+                  {...register('maternalSurname', {
+                    required: 'Apellido materno es requerido',
+                  })}
+                />
+                <InputLeftElement>
+                  <Icon color="blue.400" w="5" h="5" as={FaUserCircle} />
+                </InputLeftElement>
+              </InputGroup>
+              <FormErrorMessage>
+                {errors.maternalSurname && errors.maternalSurname.message}
+              </FormErrorMessage>
+            </FormControl>
+          </Flex>
           <FormControl isInvalid={errors.email} mb="6">
             <FormLabel htmlFor="email">Email</FormLabel>
             <InputGroup>
@@ -131,13 +199,13 @@ export default function Login() {
             colorScheme="blue"
             isLoading={isSubmitting}
           >
-            Iniciar sesión
+            Crear cuenta
           </Button>
         </form>
-        <Flex textAlign="center" mt="5" justifyContent="space-around">
-          <Text>¿Aún no tienes cuenta?</Text>
-          <NextLink href="/registro" passHref>
-            <Link color="blue.400">Crea una cuenta</Link>
+        <Flex textAlign="center" mt="6" justifyContent="space-evenly">
+          <Text>¿Ya tienes cuenta?</Text>
+          <NextLink href="/login" passHref>
+            <Link color="blue.400">Inicia sesión</Link>
           </NextLink>
         </Flex>
       </Box>

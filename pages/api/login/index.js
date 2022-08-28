@@ -1,3 +1,4 @@
+import { serialize } from 'cookie'
 import { SHA256 } from 'crypto-js'
 
 import { httpStatus } from '/constants'
@@ -32,10 +33,21 @@ export default async function handler(req, res) {
       },
     })
 
-    return res.status(httpStatus.HTTP_200_OK).json({
-      token,
-      tokenType: 'Bearer',
-    })
+    return res
+      .setHeader(
+        'Set-Cookie',
+        serialize('session', token, {
+          path: '/',
+          secure: true,
+          priority: 'high',
+          maxAge: EXPIRATION_MINUTES * 60,
+        }),
+      )
+      .status(httpStatus.HTTP_200_OK)
+      .json({
+        token,
+        tokenType: 'Bearer',
+      })
   } catch (error) {
     console.error(error)
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
