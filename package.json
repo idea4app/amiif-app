@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "yarn gcloud:build && yarn gcloud:deploy",
+    "gcloud:build": "gcloud builds submit --tag gcr.io/anet-amiif/amiif-app --project anet-amiif",
+    "gcloud:deploy": "gcloud run deploy --image gcr.io/anet-amiif/amiif-app --project anet-amiif --platform managed"
   },
   "peerDependencies": {
     "@chakra-ui/system": "2.2.7"
