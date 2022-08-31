@@ -6,5 +6,5 @@
 .react-calendar__tile:enabled:hover,
 .react-calendar__tile:enabled:focus {
   border: none !important;
-  background: transparent !important;
+  /* background: transparent !important; */
 }

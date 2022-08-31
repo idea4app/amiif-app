@@ -6,7 +6,7 @@ import { httpStatus, notifyTypes, shoppingStatus } from '/constants'
 const { SECRET_KEY } = process.env
 
 async function validateShopping(req, res) {
-  if (res.user.type !== 'admin') {
+  if (res.user.roles.shoppings !== 'admin') {
     return res.status(httpStatus.HTTP_403_FORBIDDEN).json({
       error: 'Not authorized to perform requested action',
     })
