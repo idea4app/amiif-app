@@ -14,10 +14,8 @@ export function createAccessToken({
   return token
 }
 
-export function verifyAccessToken({ bearerToken, secretKey }) {
+export function verifyAccessToken({ token, secretKey }) {
   try {
-    const token = bearerToken.replace('Bearer ', '')
-
     const tokenData = jwt.verify(token, secretKey)
 
     return tokenData
@@ -29,7 +27,11 @@ export function verifyAccessToken({ bearerToken, secretKey }) {
 
 export function decodeToken(token) {
   try {
-    return jwt.decode(token)
+    const tokenData = jwt.decode(token)
+    return {
+      ...tokenData,
+      token,
+    }
   } catch (error) {
     return null
   }

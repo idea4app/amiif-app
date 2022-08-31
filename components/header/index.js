@@ -64,58 +64,61 @@ export default function Header({ user }) {
   }
 
   return (
-    <Flex
-      boxShadow="lg"
-      padding="10px 20px"
-      background={background}
-      justifyContent="space-between"
-    >
-      <Flex>
-        <Button mr="5" ref={btnRef} colorScheme="gray" onClick={onOpen}>
-          <Icon w="5" h="5" as={FaAlignJustify} />
-        </Button>
-        <NextLink href="/">
-          <Image
-            height="40px"
-            loading="lazy"
-            alt="AMIIF logo"
-            src="/images/logo-amiif-border.png"
-          />
-        </NextLink>
-      </Flex>
-      <Flex flex="1" p="0 100px">
-        <InputGroup>
-          <InputLeftElement>
-            <Icon color="blue.400" w="5" h="5" as={FaSearch} />
-          </InputLeftElement>
-          <Input
-            type="text"
-            rounded="full"
-            variant="filled"
-            placeholder="Buscar..."
-          />
-        </InputGroup>
-      </Flex>
-      <Flex>
-        <Popover>
-          <PopoverTrigger>
-            <Button mr="5" ref={btnRef} colorScheme="gray">
-              <Icon w="5" h="5" as={FaUserAlt} />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent>
-            <PopoverArrow />
-            <PopoverCloseButton />
-            <PopoverHeader>
-              <Text color="teal.400">{user?.email}</Text>
-            </PopoverHeader>
-            <PopoverFooter>
-              <Button width="100%" onClick={handleLogout}>
-                Cerrar sesión
+    <Flex boxShadow="lg" padding="10px 0" background={background}>
+      <Flex
+        width="100%"
+        padding="0 50px"
+        margin="0 auto"
+        maxWidth="1200px"
+        justifyContent="space-between"
+      >
+        <Flex>
+          <Button mr="5" ref={btnRef} colorScheme="gray" onClick={onOpen}>
+            <Icon w="5" h="5" as={FaAlignJustify} />
+          </Button>
+          <NextLink href="/">
+            <Image
+              height="40px"
+              loading="lazy"
+              alt="AMIIF logo"
+              src="/images/logo-amiif-border.png"
+            />
+          </NextLink>
+        </Flex>
+        <Flex flex="1" p="0 100px">
+          <InputGroup>
+            <InputLeftElement>
+              <Icon color="blue.400" w="5" h="5" as={FaSearch} />
+            </InputLeftElement>
+            <Input
+              type="text"
+              rounded="full"
+              variant="filled"
+              placeholder="Buscar..."
+            />
+          </InputGroup>
+        </Flex>
+        <Flex>
+          <Popover>
+            <PopoverTrigger>
+              <Button ref={btnRef} colorScheme="gray">
+                <Icon w="5" h="5" as={FaUserAlt} />
               </Button>
-            </PopoverFooter>
-          </PopoverContent>
-        </Popover>
+            </PopoverTrigger>
+            <PopoverContent>
+              <PopoverArrow />
+              <PopoverCloseButton />
+              <PopoverHeader>
+                <Text color="teal.400">{user?.email}</Text>
+              </PopoverHeader>
+              <PopoverFooter>
+                <Button width="100%" onClick={handleLogout}>
+                  Cerrar sesión
+                </Button>
+              </PopoverFooter>
+            </PopoverContent>
+          </Popover>
+        </Flex>
       </Flex>
       <Drawer
         size="xs"

@@ -1,21 +1,209 @@
+import { useState } from 'react'
 import PropTypes from 'prop-types'
-import { Flex, Grid, Heading } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
+import {
+  Td,
+  Th,
+  Tr,
+  Box,
+  Flex,
+  Icon,
+  Badge,
+  Table,
+  Tbody,
+  Thead,
+  Button,
+  Heading,
+  useDisclosure,
+  TableContainer,
+} from '@chakra-ui/react'
+import { FaEye, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 
-import { getLoggedUser } from '/lib/session'
+import ModalAddShopping from '/components/modal-add-shopping'
+import ModalActionShopping from '/components/modal-action-shopping'
+
 import Page from '/lib/page'
+import { shoppingStatus } from '/constants'
+import { fetcher, formatDate } from '/utils'
+import { getLoggedUser } from '/lib/session'
 
-export default function Home({ user }) {
+export default function Shoppings({ data, user }) {
+  const router = useRouter()
+  const [shopping, setShopping] = useState(null)
+  const { isOpen, onClose, onOpen } = useDisclosure()
+
+  const columns = [
+    { name: 'Orden (ID)', id: 'id' },
+    { name: 'Fecha de entrega', id: 'deliveryAt' },
+    { name: 'Creado Por', id: 'userName' },
+    { name: 'Estado', id: 'status' },
+    { name: '', id: 'actions' },
+  ]
+
+  async function handleApprove(event) {
+    const action = event.target.dataset.action
+    const request = await fetcher(`/api/shoppings/check/${shopping.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ action }),
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    })
+
+    const response = await request.json()
+    const newStatus = response.status
+
+    data.shoppings = data.shoppings.map(shopping => {
+      if (shopping.id === response.id) {
+        shopping.status = newStatus
+      }
+      return shopping
+    })
+
+    setShopping(null)
+  }
+
+  async function handleAddShopping({ description, deliveryAt }) {
+    const request = await fetcher('/api/shoppings', {
+      method: 'POST',
+      body: JSON.stringify({ description, deliveryAt }),
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    })
+
+    const response = await request.json()
+
+    data.shoppings = [...data.shoppings, response]
+
+    onClose()
+  }
+
   return (
     <Page user={user}>
-      <Flex direction="column" textAlign="center">
-        <Heading>AMIIF App</Heading>
-        <Heading size="lg">In progress section</Heading>
+      <ModalActionShopping
+        userType={user.type}
+        isOpen={!!shopping}
+        shopping={shopping}
+        onApprove={handleApprove}
+        onClose={() => setShopping(null)}
+      />
+      <ModalAddShopping
+        isOpen={isOpen}
+        onClose={onClose}
+        onCreate={handleAddShopping}
+      />
+      <Flex mt="5" justifyContent="space-between">
+        <Heading size="lg">Compras</Heading>
+        <Button colorScheme="blue" variant="solid" onClick={onOpen}>
+          Agregar
+        </Button>
+      </Flex>
+      <Box mt="6" borderWidth="3px" rounded="lg" minHeight="410px">
+        <TableContainer>
+          <Table variant="striped" colorScheme="gray">
+            <Thead>
+              <Tr>
+                {columns.map(column => (
+                  <Th key={column.id} textAlign="center">
+                    {column.name}
+                  </Th>
+                ))}
+              </Tr>
+            </Thead>
+            <Tbody>
+              {data.shoppings.map(shopping => {
+                const { id, status, user, deliveryAt } = shopping
+                const [{ firstname, paternalSurname }] = user
+                return (
+                  <Tr key={id}>
+                    <Td textAlign="center">{id}</Td>
+                    <Td textAlign="center">
+                      {formatDate(deliveryAt, {
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </Td>
+                    <Td textAlign="center">{`${firstname} ${paternalSurname}`}</Td>
+                    <Td textAlign="center">
+                      {status === shoppingStatus.PENDING && (
+                        <Badge variant="outline" colorScheme="yellow">
+                          Pendiente
+                        </Badge>
+                      )}
+                      {status === shoppingStatus.APPROVED && (
+                        <Badge variant="outline" colorScheme="green">
+                          Aprobado
+                        </Badge>
+                      )}
+                      {status === shoppingStatus.CANCELED && (
+                        <Badge variant="outline" colorScheme="red">
+                          Cancelada
+                        </Badge>
+                      )}
+                    </Td>
+                    <Td textAlign="center">
+                      <Button
+                        colorScheme="blue"
+                        onClick={() => setShopping(shopping)}
+                      >
+                        <Icon as={FaEye} />
+                      </Button>
+                    </Td>
+                  </Tr>
+                )
+              })}
+            </Tbody>
+          </Table>
+        </TableContainer>
+      </Box>
+      <Flex justifyContent="center" mt="6">
+        {data.page !== 1 && (
+          <Button
+            mr="3"
+            size="sm"
+            colorScheme="yellow"
+            onClick={() =>
+              router.push(`/compras?page=${Math.max(data.page - 1, 1)}`)
+            }
+          >
+            <Icon as={FaChevronLeft} />
+          </Button>
+        )}
+        {Array.from(Array(data.pages).keys()).map(page => {
+          return (
+            <Button
+              mr="3"
+              size="sm"
+              colorScheme="yellow"
+              key={`pagination-${page}`}
+              disabled={data.page === page + 1}
+              onClick={() => router.push(`/compras?page=${page + 1}`)}
+            >
+              {page + 1}
+            </Button>
+          )
+        })}
+        {data.page < data.pages && (
+          <Button
+            mr="3"
+            size="sm"
+            colorScheme="yellow"
+            onClick={() =>
+              router.push(
+                `/compras?page=${Math.min(data.page + 1, data.pages)}`,
+              )
+            }
+          >
+            <Icon as={FaChevronRight} />
+          </Button>
+        )}
       </Flex>
     </Page>
   )
 }
 
-export const getServerSideProps = async ({ req }) => {
+export const getServerSideProps = async ({ req, query }) => {
   const user = await getLoggedUser(req)
 
   if (!user) {
@@ -27,16 +215,50 @@ export const getServerSideProps = async ({ req }) => {
     }
   }
 
+  const page = query.page || 1
+  const request = await fetcher(
+    `${process.env.BASE_URL}/api/shoppings?perPage=5&page=${page}`,
+    {
+      headers: {
+        authorization: `Bearer ${user.token}`,
+      },
+    },
+  )
+
+  const data = await request.json()
+
   return {
     props: {
       user,
+      data,
     },
   }
 }
 
-Home.propTypes = {
+Shoppings.propTypes = {
   user: PropTypes.shape({
     email: PropTypes.string,
     type: PropTypes.string,
+    token: PropTypes.string,
+  }),
+  data: PropTypes.shape({
+    page: PropTypes.number,
+    pages: PropTypes.number,
+    perPage: PropTypes.number,
+    shoppings: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string,
+        status: PropTypes.string,
+        deliveryAt: PropTypes.string,
+        description: PropTypes.string,
+        user: PropTypes.arrayOf(
+          PropTypes.shape({
+            firstname: PropTypes.string,
+            maternalSurname: PropTypes.string,
+            paternalSurname: PropTypes.string,
+          }),
+        ),
+      }),
+    ),
   }),
 }
