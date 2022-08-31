@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useRouter } from 'next/router'
 import {
@@ -13,9 +14,13 @@ import {
   Thead,
   Button,
   Heading,
+  useDisclosure,
   TableContainer,
 } from '@chakra-ui/react'
 import { FaEye, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+
+import ModalAddShopping from '/components/modal-add-shopping'
+import ModalActionShopping from '/components/modal-action-shopping'
 
 import Page from '/lib/page'
 import { shoppingStatus } from '/constants'
@@ -24,6 +29,8 @@ import { getLoggedUser } from '/lib/session'
 
 export default function Shoppings({ data, user }) {
   const router = useRouter()
+  const [shopping, setShopping] = useState(null)
+  const { isOpen, onClose, onOpen } = useDisclosure()
 
   const columns = [
     { name: 'Orden (ID)', id: 'id' },
@@ -33,11 +40,62 @@ export default function Shoppings({ data, user }) {
     { name: '', id: 'actions' },
   ]
 
+  async function handleApprove(event) {
+    const action = event.target.dataset.action
+    const request = await fetcher(`/api/shoppings/check/${shopping.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ action }),
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    })
+
+    const response = await request.json()
+    const newStatus = response.status
+
+    data.shoppings = data.shoppings.map(shopping => {
+      if (shopping.id === response.id) {
+        shopping.status = newStatus
+      }
+      return shopping
+    })
+
+    setShopping(null)
+  }
+
+  async function handleAddShopping({ description, deliveryAt }) {
+    const request = await fetcher('/api/shoppings', {
+      method: 'POST',
+      body: JSON.stringify({ description, deliveryAt }),
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    })
+
+    const response = await request.json()
+
+    data.shoppings = [...data.shoppings, response]
+
+    onClose()
+  }
+
   return (
     <Page user={user}>
+      <ModalActionShopping
+        userType={user.type}
+        isOpen={!!shopping}
+        shopping={shopping}
+        onApprove={handleApprove}
+        onClose={() => setShopping(null)}
+      />
+      <ModalAddShopping
+        isOpen={isOpen}
+        onClose={onClose}
+        onCreate={handleAddShopping}
+      />
       <Flex mt="5" justifyContent="space-between">
         <Heading size="lg">Compras</Heading>
-        <Button colorScheme="blue" variant="solid">
+        <Button colorScheme="blue" variant="solid" onClick={onOpen}>
           Agregar
         </Button>
       </Flex>
@@ -85,7 +143,10 @@ export default function Shoppings({ data, user }) {
                       )}
                     </Td>
                     <Td textAlign="center">
-                      <Button colorScheme="blue">
+                      <Button
+                        colorScheme="blue"
+                        onClick={() => setShopping(shopping)}
+                      >
                         <Icon as={FaEye} />
                       </Button>
                     </Td>
@@ -178,6 +239,7 @@ Shoppings.propTypes = {
   user: PropTypes.shape({
     email: PropTypes.string,
     type: PropTypes.string,
+    token: PropTypes.string,
   }),
   data: PropTypes.shape({
     page: PropTypes.number,

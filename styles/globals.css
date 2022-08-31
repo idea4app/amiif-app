@@ -1,0 +1,10 @@
+.calendar,
+.react-calendar__tile:disabled,
+.react-calendar__navigation button:disabled,
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus,
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  border: none !important;
+  background: transparent !important;
+}

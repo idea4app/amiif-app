@@ -1,11 +1,11 @@
 import { verifyAccessToken } from '/utils'
 import { emailNotifier } from '/lib/notifier'
 import { mongoClient } from '/config/database'
-import { httpStatus, shoppingStatus, notifyTypes } from '/constants'
+import { httpStatus, notifyTypes, shoppingStatus } from '/constants'
 
 const { SECRET_KEY } = process.env
 
-async function validateShoppin(req, res) {
+async function validateShopping(req, res) {
   if (res.user.type !== 'admin') {
     return res.status(httpStatus.HTTP_403_FORBIDDEN).json({
       error: 'Not authorized to perform requested action',
@@ -13,10 +13,12 @@ async function validateShoppin(req, res) {
   }
 
   try {
+    const { action } = req.body
     const { shoppingId } = req.query
 
-    const status =
-      (req.body.status && shoppingStatus.APPROVED) || shoppingStatus.CANCELED
+    const status = shoppingStatus[action]
+
+    console.log({ status })
 
     const db = await mongoClient()
     const collection = await db.collection('shoppings')
@@ -70,8 +72,10 @@ export default async function handler(req, res) {
   res.user = await db.collection('users').findOne({ email: userData.email })
 
   if (req.method === 'PUT') {
-    return validateShoppin(req, res)
+    return validateShopping(req, res)
   }
 
-  return res.send('fail')
+  return res.status(httpStatus.HTTP_404_NOT_FOUND).json({
+    error: 'method not allowed',
+  })
 }

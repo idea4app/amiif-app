@@ -70,7 +70,8 @@ async function createShopping(req, res) {
   }
 
   // validate deliveryAt has correct format
-  const regexDate = /^\d{4}-\d{1,2}-\d{1,2}$/
+  const regexDate =
+    /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/
   if (!regexDate.test(req.body.deliveryAt)) {
     return res.status(httpStatus.HTTP_400_BAD_REQUEST).json({
       error: 'format invalid deliveryAt',
@@ -130,10 +131,9 @@ async function createShopping(req, res) {
       status,
       deliveryAt,
       description,
-      user: res.user,
+      user: [res.user],
     })
   } catch (error) {
-    console.error(error)
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
       error: 'Internal Server Error',
     })
