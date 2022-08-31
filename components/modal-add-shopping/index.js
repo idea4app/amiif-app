@@ -18,16 +18,25 @@ import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
 
 export default function ModalAddShopping({ isOpen, onClose, onCreate }) {
-  const [deliveryAt, setDeliveryAt] = useState(new Date())
+  const [error, setError] = useState('')
   const [description, setDescription] = useState('')
+  const [deliveryAt, setDeliveryAt] = useState(new Date())
 
-  function handleCreate(event) {
+  async function handleCreate(event) {
     event.preventDefault()
 
-    onCreate({
+    const success = await onCreate({
       description,
       deliveryAt: deliveryAt.toISOString(),
     })
+
+    if (success) {
+      setDescription('')
+      setDeliveryAt(new Date())
+      return onClose()
+    }
+
+    setError('La fecha debe ser mayor a la fecha actual')
   }
 
   return (
@@ -50,16 +59,27 @@ export default function ModalAddShopping({ isOpen, onClose, onCreate }) {
               Descripción
             </Text>
             <Textarea
-              resize="none"
+              required
+              minHeight="200px"
               borderWidth="2px"
               value={description}
               borderColor="blue.400"
+              placeholder="Conceptos separados por saltos de línea"
               onChange={e => setDescription(e.target.value)}
             />
+            <Text
+              mt="1"
+              mb="1"
+              fontSize="sm"
+              color="red.500"
+              textAlign="center"
+            >
+              {error}
+            </Text>
           </ModalBody>
           <ModalFooter>
             <Button type="submit" colorScheme="green">
-              Aceptar
+              Crear
             </Button>
           </ModalFooter>
         </form>

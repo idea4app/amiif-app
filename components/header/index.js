@@ -27,25 +27,34 @@ import {
   PopoverCloseButton,
   useColorModeValue,
 } from '@chakra-ui/react'
+
+import { FaBoxes } from 'react-icons/fa'
 import {
-  IoCash,
-  IoHelpBuoySharp,
-  IoAirplaneSharp,
-  IoCarSportSharp,
+  IoCard,
+  IoWallet,
+  IoPerson,
+  IoSearch,
+  IoDocument,
+  IoAppsSharp,
+  IoAirplane,
+  IoHelpBuoy,
 } from 'react-icons/io5'
-import { FcDocument } from 'react-icons/fc'
-import { FaBoxes, FaSearch, FaUserAlt, FaAlignJustify } from 'react-icons/fa'
 
 import { fetcher } from '/utils'
 import { httpStatus } from '/constants'
 
 const routes = [
-  { path: '/compras', name: 'Compras', disabled: false, icon: IoCarSportSharp },
-  { path: '/contratos', name: 'Contratos', disabled: true, icon: FcDocument },
+  { path: '/compras', name: 'Compras', disabled: false, icon: IoCard },
+  {
+    path: '/contratos',
+    name: 'Contratos',
+    disabled: false,
+    icon: IoDocument,
+  },
   { path: '/proveedores', name: 'Proveedores', disabled: true, icon: FaBoxes },
-  { path: '/gastos', name: 'Gastos', disabled: true, icon: IoCash },
-  { path: '/viajes', name: 'Viajes', disabled: true, icon: IoAirplaneSharp },
-  { path: '/soporte', name: 'Soporte', disabled: true, icon: IoHelpBuoySharp },
+  { path: '/gastos', name: 'Gastos', disabled: true, icon: IoWallet },
+  { path: '/viajes', name: 'Viajes', disabled: true, icon: IoAirplane },
+  { path: '/soporte', name: 'Soporte', disabled: true, icon: IoHelpBuoy },
 ]
 
 export default function Header({ user }) {
@@ -74,7 +83,7 @@ export default function Header({ user }) {
       >
         <Flex>
           <Button mr="5" ref={btnRef} colorScheme="gray" onClick={onOpen}>
-            <Icon w="5" h="5" as={FaAlignJustify} />
+            <Icon w="5" h="5" as={IoAppsSharp} />
           </Button>
           <NextLink href="/">
             <Image
@@ -88,7 +97,7 @@ export default function Header({ user }) {
         <Flex flex="1" p="0 100px">
           <InputGroup>
             <InputLeftElement>
-              <Icon color="blue.400" w="5" h="5" as={FaSearch} />
+              <Icon color="blue.400" w="5" h="5" as={IoSearch} />
             </InputLeftElement>
             <Input
               type="text"
@@ -102,7 +111,7 @@ export default function Header({ user }) {
           <Popover>
             <PopoverTrigger>
               <Button ref={btnRef} colorScheme="gray">
-                <Icon w="5" h="5" as={FaUserAlt} />
+                <Icon w="5" h="5" as={IoPerson} />
               </Button>
             </PopoverTrigger>
             <PopoverContent>

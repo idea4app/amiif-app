@@ -7,11 +7,24 @@ import { createAccessToken, validateEmail, validatePassword } from '/utils'
 
 const { ALGORITHM, SECRET_KEY, EXPIRATION_MINUTES } = process.env
 
+const roles = {
+  full: {
+    contracts: 'admin',
+    shoppings: 'admin',
+  },
+  standard: {
+    contracts: 'standard',
+    shoppings: 'standard',
+  },
+  legal: {
+    contracts: 'admin',
+    shoppings: 'standard',
+  },
+}
+
 export default async function handler(req, res) {
   try {
-    const { email, password, firstname, maternalSurname, paternalSurname } =
-      req.body
-
+    const { email, password, firstname, lastname } = req.body
     const db = await mongoClient()
     const user = await db.collection('users').findOne({ email })
 
@@ -34,13 +47,12 @@ export default async function handler(req, res) {
       phone: '',
       photo: '',
       birthdate: '',
-      type: 'admin',
       company: 'AMIIF',
       email,
+      lastname,
       firstname,
-      maternalSurname,
-      paternalSurname,
       password: SHA256(password).toString(),
+      roles: roles.standard,
     }
 
     await db.collection('users').insertOne(userFields)
@@ -51,7 +63,7 @@ export default async function handler(req, res) {
       expirationInMinutes: EXPIRATION_MINUTES,
       data: {
         email,
-        type: userFields.type,
+        roles: userFields.roles,
       },
     })
 

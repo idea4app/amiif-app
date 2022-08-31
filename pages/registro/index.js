@@ -38,21 +38,14 @@ export default function Login() {
   const boxBackground = useColorModeValue('gray.50', 'gray.700')
   const loginBackground = useColorModeValue('gray.200', 'gray.800')
 
-  async function onSubmit({
-    email,
-    password,
-    firstname,
-    maternalSurname,
-    paternalSurname,
-  }) {
+  async function onSubmit({ email, password, lastname, firstname }) {
     const request = await fetcher('/api/register', {
       method: 'POST',
       body: JSON.stringify({
         email,
         password,
+        lastname,
         firstname,
-        maternalSurname,
-        paternalSurname,
       }),
     })
 
@@ -97,33 +90,15 @@ export default function Login() {
           Crea tu cuenta
         </Heading>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormControl isInvalid={errors.firstname} mb="6">
-            <FormLabel htmlFor="firstname">Nombre</FormLabel>
-            <InputGroup>
-              <Input
-                id="firstname"
-                placeholder="Ingresa tu nombre"
-                {...register('firstname', {
-                  required: 'Nombre es requerido',
-                })}
-              />
-              <InputLeftElement>
-                <Icon color="blue.400" w="5" h="5" as={FaUserCircle} />
-              </InputLeftElement>
-            </InputGroup>
-            <FormErrorMessage>
-              {errors.firstname && errors.firstname.message}
-            </FormErrorMessage>
-          </FormControl>
           <Flex mb="6">
-            <FormControl isInvalid={errors.paternalSurname} mr="6">
-              <FormLabel htmlFor="paternalSurname">Apellido paterno</FormLabel>
+            <FormControl isInvalid={errors.firstname} mr="6">
+              <FormLabel htmlFor="firstname">Nombre</FormLabel>
               <InputGroup>
                 <Input
-                  id="paternalSurname"
-                  placeholder="Apellido paterno"
-                  {...register('paternalSurname', {
-                    required: 'Apellido paterno es requerido',
+                  id="firstname"
+                  placeholder="Tu Nombre"
+                  {...register('firstname', {
+                    required: 'Nombre es requerido',
                   })}
                 />
                 <InputLeftElement>
@@ -131,18 +106,18 @@ export default function Login() {
                 </InputLeftElement>
               </InputGroup>
               <FormErrorMessage>
-                {errors.paternalSurname && errors.paternalSurname.message}
+                {errors.firstname && errors.firstname.message}
               </FormErrorMessage>
             </FormControl>
             <Spacer />
-            <FormControl isInvalid={errors.maternalSurname}>
-              <FormLabel htmlFor="maternalSurname">Apellido materno</FormLabel>
+            <FormControl isInvalid={errors.lastname} mr="6">
+              <FormLabel htmlFor="lastname">Apellidos</FormLabel>
               <InputGroup>
                 <Input
-                  id="maternalSurname"
-                  placeholder="Apellido materno"
-                  {...register('maternalSurname', {
-                    required: 'Apellido materno es requerido',
+                  id="lastname"
+                  placeholder="Tus Apellidos"
+                  {...register('lastname', {
+                    required: 'Apellidos es requerido',
                   })}
                 />
                 <InputLeftElement>
@@ -150,7 +125,7 @@ export default function Login() {
                 </InputLeftElement>
               </InputGroup>
               <FormErrorMessage>
-                {errors.maternalSurname && errors.maternalSurname.message}
+                {errors.lastname && errors.lastname.message}
               </FormErrorMessage>
             </FormControl>
           </Flex>

@@ -23,7 +23,7 @@ import ModalAddShopping from '/components/modal-add-shopping'
 import ModalActionShopping from '/components/modal-action-shopping'
 
 import Page from '/lib/page'
-import { shoppingStatus } from '/constants'
+import { shoppingStatus, httpStatus } from '/constants'
 import { fetcher, formatDate } from '/utils'
 import { getLoggedUser } from '/lib/session'
 
@@ -37,7 +37,7 @@ export default function Shoppings({ data, user }) {
     { name: 'Fecha de entrega', id: 'deliveryAt' },
     { name: 'Creado Por', id: 'userName' },
     { name: 'Estado', id: 'status' },
-    { name: '', id: 'actions' },
+    { name: 'Visualizar', id: 'actions' },
   ]
 
   async function handleApprove(event) {
@@ -74,9 +74,13 @@ export default function Shoppings({ data, user }) {
 
     const response = await request.json()
 
-    data.shoppings = [...data.shoppings, response]
+    if (request.status === httpStatus.HTTP_201_CREATED) {
+      data.shoppings = [...data.shoppings, response]
 
-    onClose()
+      return true
+    }
+
+    return false
   }
 
   return (
@@ -114,7 +118,7 @@ export default function Shoppings({ data, user }) {
             <Tbody>
               {data.shoppings.map(shopping => {
                 const { id, status, user, deliveryAt } = shopping
-                const [{ firstname, paternalSurname }] = user
+                const [{ firstname, lastname }] = user
                 return (
                   <Tr key={id}>
                     <Td textAlign="center">{id}</Td>
@@ -124,7 +128,7 @@ export default function Shoppings({ data, user }) {
                         day: 'numeric',
                       })}
                     </Td>
-                    <Td textAlign="center">{`${firstname} ${paternalSurname}`}</Td>
+                    <Td textAlign="center">{`${firstname} ${lastname}`}</Td>
                     <Td textAlign="center">
                       {status === shoppingStatus.PENDING && (
                         <Badge variant="outline" colorScheme="yellow">
@@ -229,7 +233,10 @@ export const getServerSideProps = async ({ req, query }) => {
 
   return {
     props: {
-      user,
+      user: {
+        ...user,
+        type: user.roles.shoppings,
+      },
       data,
     },
   }
@@ -255,7 +262,7 @@ Shoppings.propTypes = {
           PropTypes.shape({
             firstname: PropTypes.string,
             maternalSurname: PropTypes.string,
-            paternalSurname: PropTypes.string,
+            lastname: PropTypes.string,
           }),
         ),
       }),

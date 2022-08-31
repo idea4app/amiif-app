@@ -10,7 +10,11 @@ import {
   ModalContent,
   ModalOverlay,
   ModalCloseButton,
+  Icon,
+  Flex,
 } from '@chakra-ui/react'
+
+import { BsDot } from 'react-icons/bs'
 
 import { shoppingStatus } from '/constants'
 
@@ -21,6 +25,7 @@ export default function ModalAddShopping({
   userType,
   onApprove,
 }) {
+  console.log({ description: shopping?.description })
   return (
     <Modal isOpen={isOpen} onClose={onClose} motionPreset="slideInBottom">
       <ModalOverlay />
@@ -29,17 +34,19 @@ export default function ModalAddShopping({
         <ModalCloseButton />
         <ModalBody>
           <Text fontSize="md" mb="2">
-            Descripción
+            Conceptos:
           </Text>
-          <Box
-            size="sm"
-            padding="4"
-            rounded="lg"
-            borderWidth="2px"
-            userSelect="none"
-            borderColor="blue.400"
-          >
-            {shopping?.description}
+          <Box mt="4" mb="4">
+            {shopping?.description.split('\n').map(item => {
+              return (
+                <Flex key={item} alignItems="center">
+                  <Icon as={BsDot} />
+                  <Text key={item} fontSize="md">
+                    {item}
+                  </Text>
+                </Flex>
+              )
+            })}
           </Box>
         </ModalBody>
         {userType === 'admin' && (
@@ -58,7 +65,7 @@ export default function ModalAddShopping({
               onClick={onApprove}
               data-action={shoppingStatus.APPROVED}
             >
-              Aceptar
+              Aprobar
             </Button>
           </ModalFooter>
         )}

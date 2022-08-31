@@ -29,7 +29,7 @@ export default async function handler(req, res) {
       expirationInMinutes: EXPIRATION_MINUTES,
       data: {
         email,
-        type: user.type,
+        roles: user.roles,
       },
     })
 

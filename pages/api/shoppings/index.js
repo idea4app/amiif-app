@@ -7,7 +7,7 @@ const { SECRET_KEY } = process.env
 
 async function getAllShoppings(req, res) {
   try {
-    const { _id, type } = res.user
+    const { _id, roles } = res.user
     const page = Number(req.query.page || 10)
     const perPage = Number(req.query.perPage || 10)
 
@@ -15,7 +15,7 @@ async function getAllShoppings(req, res) {
 
     const db = await mongoClient()
     const collection = await db.collection('shoppings')
-    const query = (type !== 'admin' && { user: _id }) || {}
+    const query = (roles.shoppings !== 'admin' && { user: _id }) || {}
 
     const shoppings = await collection
       .aggregate([
