@@ -2,6 +2,7 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 import {
   Flex,
+  Icon,
   Text,
   Modal,
   Button,
@@ -14,6 +15,7 @@ import {
   ModalCloseButton,
 } from '@chakra-ui/react'
 import Calendar from 'react-calendar'
+import { TbCheck } from 'react-icons/tb'
 
 import 'react-calendar/dist/Calendar.css'
 
@@ -41,7 +43,7 @@ export default function ModalAddShopping({ isOpen, onClose, onCreate }) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} motionPreset="slideInBottom">
-      <ModalOverlay />
+      <ModalOverlay backdropFilter="blur(10px)" />
       <ModalContent>
         <form onSubmit={handleCreate}>
           <ModalHeader>Crear orden de compra</ModalHeader>
@@ -50,7 +52,7 @@ export default function ModalAddShopping({ isOpen, onClose, onCreate }) {
             <Flex mb="5" justifyContent="center">
               <Calendar
                 value={deliveryAt}
-                minDate={deliveryAt}
+                minDate={new Date()}
                 onChange={setDeliveryAt}
                 className="calendar"
               />
@@ -78,7 +80,11 @@ export default function ModalAddShopping({ isOpen, onClose, onCreate }) {
             </Text>
           </ModalBody>
           <ModalFooter>
-            <Button type="submit" colorScheme="green">
+            <Button
+              type="submit"
+              colorScheme="green"
+              leftIcon={<Icon w="5" h="5" as={TbCheck} />}
+            >
               Crear
             </Button>
           </ModalFooter>

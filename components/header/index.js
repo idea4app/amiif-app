@@ -28,33 +28,39 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 
-import { FaBoxes } from 'react-icons/fa'
 import {
-  IoCard,
-  IoWallet,
-  IoPerson,
-  IoSearch,
-  IoDocument,
-  IoAppsSharp,
-  IoAirplane,
-  IoHelpBuoy,
-} from 'react-icons/io5'
+  TbHelp,
+  TbUser,
+  TbMenu2,
+  TbSearch,
+  TbLogout,
+  TbFileText,
+  TbCreditCard,
+  TbReportMoney,
+  TbTruckDelivery,
+  TbPlaneDeparture,
+} from 'react-icons/tb'
 
 import { fetcher } from '/utils'
 import { httpStatus } from '/constants'
 
 const routes = [
-  { path: '/compras', name: 'Compras', disabled: false, icon: IoCard },
+  { path: '/compras', name: 'Compras', disabled: false, icon: TbCreditCard },
   {
     path: '/contratos',
     name: 'Contratos',
     disabled: false,
-    icon: IoDocument,
+    icon: TbFileText,
   },
-  { path: '/proveedores', name: 'Proveedores', disabled: true, icon: FaBoxes },
-  { path: '/gastos', name: 'Gastos', disabled: true, icon: IoWallet },
-  { path: '/viajes', name: 'Viajes', disabled: true, icon: IoAirplane },
-  { path: '/soporte', name: 'Soporte', disabled: true, icon: IoHelpBuoy },
+  {
+    path: '/proveedores',
+    name: 'Proveedores',
+    disabled: true,
+    icon: TbTruckDelivery,
+  },
+  { path: '/gastos', name: 'Gastos', disabled: true, icon: TbReportMoney },
+  { path: '/viajes', name: 'Viajes', disabled: true, icon: TbPlaneDeparture },
+  { path: '/soporte', name: 'Soporte', disabled: true, icon: TbHelp },
 ]
 
 export default function Header({ user }) {
@@ -83,7 +89,7 @@ export default function Header({ user }) {
       >
         <Flex>
           <Button mr="5" ref={btnRef} colorScheme="gray" onClick={onOpen}>
-            <Icon w="5" h="5" as={IoAppsSharp} />
+            <Icon w="5" h="5" as={TbMenu2} />
           </Button>
           <NextLink href="/">
             <Image
@@ -97,7 +103,7 @@ export default function Header({ user }) {
         <Flex flex="1" p="0 100px">
           <InputGroup>
             <InputLeftElement>
-              <Icon color="blue.400" w="5" h="5" as={IoSearch} />
+              <Icon color="blue.400" w="5" h="5" as={TbSearch} />
             </InputLeftElement>
             <Input
               type="text"
@@ -111,7 +117,7 @@ export default function Header({ user }) {
           <Popover>
             <PopoverTrigger>
               <Button ref={btnRef} colorScheme="gray">
-                <Icon w="5" h="5" as={IoPerson} />
+                <Icon w="5" h="5" as={TbUser} />
               </Button>
             </PopoverTrigger>
             <PopoverContent>
@@ -121,7 +127,12 @@ export default function Header({ user }) {
                 <Text color="teal.400">{user?.email}</Text>
               </PopoverHeader>
               <PopoverFooter>
-                <Button width="100%" onClick={handleLogout}>
+                <Button
+                  width="100%"
+                  colorScheme="red"
+                  onClick={handleLogout}
+                  leftIcon={<Icon as={TbLogout} />}
+                >
                   Cerrar sesión
                 </Button>
               </PopoverFooter>

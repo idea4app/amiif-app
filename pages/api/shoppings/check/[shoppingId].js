@@ -18,8 +18,6 @@ async function validateShopping(req, res) {
 
     const status = shoppingStatus[action]
 
-    console.log({ status })
-
     const db = await mongoClient()
     const collection = await db.collection('shoppings')
     const { value } = await collection.findOneAndUpdate(

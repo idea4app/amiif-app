@@ -1,5 +1,5 @@
 import { Icon, Flex, Text, Switch, useColorMode } from '@chakra-ui/react'
-import { FaSun, FaMoon } from 'react-icons/fa'
+import { TbSun, TbMoon } from 'react-icons/tb'
 
 export default function Footer() {
   const { colorMode, toggleColorMode } = useColorMode()
@@ -17,8 +17,8 @@ export default function Footer() {
           {new Date().getFullYear()}
         </Text>
         <Flex>
-          {(colorMode === 'dark' && <Icon w="5" h="5" as={FaSun} />) || (
-            <Icon w="5" h="5" as={FaMoon} color="gray.500" />
+          {(colorMode === 'dark' && <Icon w="5" h="5" as={TbSun} />) || (
+            <Icon w="5" h="5" as={TbMoon} color="gray.500" />
           )}
           <Switch
             ml="3"

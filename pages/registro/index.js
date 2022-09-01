@@ -20,7 +20,7 @@ import {
   InputLeftElement,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { FaLock, FaEnvelope, FaUserCircle } from 'react-icons/fa'
+import { TbUser, TbMail, TbLock } from 'react-icons/tb'
 
 import { fetcher } from '/utils'
 import { httpStatus } from '/constants'
@@ -102,7 +102,7 @@ export default function Login() {
                   })}
                 />
                 <InputLeftElement>
-                  <Icon color="blue.400" w="5" h="5" as={FaUserCircle} />
+                  <Icon color="blue.400" w="5" h="5" as={TbUser} />
                 </InputLeftElement>
               </InputGroup>
               <FormErrorMessage>
@@ -121,7 +121,7 @@ export default function Login() {
                   })}
                 />
                 <InputLeftElement>
-                  <Icon color="blue.400" w="5" h="5" as={FaUserCircle} />
+                  <Icon color="blue.400" w="5" h="5" as={TbUser} />
                 </InputLeftElement>
               </InputGroup>
               <FormErrorMessage>
@@ -141,7 +141,7 @@ export default function Login() {
                 })}
               />
               <InputLeftElement>
-                <Icon color="blue.400" w="5" h="5" as={FaEnvelope} />
+                <Icon color="blue.400" w="5" h="5" as={TbMail} />
               </InputLeftElement>
             </InputGroup>
             <FormErrorMessage>
@@ -160,7 +160,7 @@ export default function Login() {
                 })}
               />
               <InputLeftElement>
-                <Icon color="blue.400" w="5" h="5" as={FaLock} />
+                <Icon color="blue.400" w="5" h="5" as={TbLock} />
               </InputLeftElement>
             </InputGroup>
             <FormErrorMessage>

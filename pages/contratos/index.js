@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useRouter } from 'next/router'
 import {
@@ -8,6 +7,7 @@ import {
   Box,
   Flex,
   Icon,
+  Text,
   Badge,
   Table,
   Tbody,
@@ -17,98 +17,59 @@ import {
   useDisclosure,
   TableContainer,
 } from '@chakra-ui/react'
-import { TbChecklist, TbChevronLeft, TbChevronRight } from 'react-icons/tb'
+import {
+  TbFileText,
+  TbFileUpload,
+  TbChevronLeft,
+  TbChevronRight,
+} from 'react-icons/tb'
 
-import ModalAddShopping from '/components/modal-add-shopping'
-import ModalActionShopping from '/components/modal-action-shopping'
+import ModalUploadContract from '../../components/modal-upload-contract'
 
-import Page from '/lib/page'
-import { shoppingStatus, httpStatus } from '/constants'
-import { fetcher, formatDate } from '/utils'
-import { getLoggedUser } from '/lib/session'
+import Page from '../../lib/page'
+import { contractStatus } from '../../constants'
+import { fetcher, formatDate } from '../../utils'
+import { getLoggedUser } from '../../lib/session'
 
-export default function Shoppings({ data, user }) {
+export default function Contracts({ data = {}, user }) {
   const router = useRouter()
-  const [shopping, setShopping] = useState(null)
-  const { isOpen, onClose, onOpen } = useDisclosure()
+  const uploadContract = useDisclosure()
 
   const columns = [
-    { name: 'No. Order', id: 'id' },
+    { name: 'Nombre', id: 'name' },
     { name: 'Estado', id: 'status' },
-    { name: 'Fecha de creación', id: 'deliveryAt' },
-    { name: 'Creado Por', id: 'userName' },
+    { name: 'Fecha de creación', id: 'createdAt' },
+    { name: 'Fecha de aprobación', id: 'approvedAt' },
+    { name: 'Creado por', id: 'createdBy' },
     { name: 'Visualizar', id: 'actions' },
   ]
 
-  async function handleApprove(event) {
-    const action = event.target.dataset.action
-    const request = await fetcher(`/api/shoppings/check/${shopping.id}`, {
-      method: 'PUT',
-      body: JSON.stringify({ action }),
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    })
-
-    const response = await request.json()
-    const newStatus = response.status
-
-    data.shoppings = data.shoppings.map(shopping => {
-      if (shopping.id === response.id) {
-        shopping.status = newStatus
-      }
-      return shopping
-    })
-
-    setShopping(null)
-  }
-
-  async function handleAddShopping({ description, deliveryAt }) {
-    const request = await fetcher('/api/shoppings', {
-      method: 'POST',
-      body: JSON.stringify({ description, deliveryAt }),
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    })
-
-    if (request.status !== httpStatus.HTTP_201_CREATED) {
-      return false
-    }
-
-    if (data.shoppings.length < data.perPage) {
-      const response = await request.json()
-      data.shoppings = [...data.shoppings, response]
-    } else if (data.pages === data.page) {
+  function handleOnCreate(contractData) {
+    if (data.page === data.pages) {
       data.pages += 1
+    } else if (data.contracts.length < data.perPage) {
+      data.contracts = [...data.contracts, contractData]
     }
 
-    return true
+    uploadContract.onClose()
   }
 
   return (
     <Page user={user}>
-      <ModalActionShopping
-        userType={user.type}
-        isOpen={!!shopping}
-        shopping={shopping}
-        onApprove={handleApprove}
-        onClose={() => setShopping(null)}
-      />
-      <ModalAddShopping
-        isOpen={isOpen}
-        onClose={onClose}
-        onCreate={handleAddShopping}
+      <ModalUploadContract
+        {...uploadContract}
+        user={user}
+        onCreate={handleOnCreate}
       />
       <Flex mt="5" justifyContent="space-between">
-        <Heading size="lg">Compras</Heading>
+        <Heading size="lg">Contratos</Heading>
         <Button
           variant="solid"
-          onClick={onOpen}
           colorScheme="green"
-          rightIcon={<Icon w="5" h="5" as={TbChecklist} />}
+          onClick={uploadContract.onOpen}
+          rightIcon={<Icon w="5" h="5" as={TbFileUpload} />}
         >
-          Crear order
+          Subir contrato
         </Button>
       </Flex>
       <Box mt="6" borderWidth="3px" rounded="lg" minHeight="410px">
@@ -117,49 +78,67 @@ export default function Shoppings({ data, user }) {
             <Thead>
               <Tr>
                 {columns.map(column => (
-                  <Th key={column.id} textAlign="center">
+                  <Th
+                    key={column.id}
+                    textAlign={(column.id !== 'name' && 'center') || 'left'}
+                  >
                     {column.name}
                   </Th>
                 ))}
               </Tr>
             </Thead>
             <Tbody>
-              {data.shoppings.map(shopping => {
-                const { id, status, user, deliveryAt } = shopping
+              {(data.contracts || []).map(contract => {
+                const { id, name, status, user, createdAt, approvedAt } =
+                  contract
                 const [{ firstname, lastname }] = user
                 return (
                   <Tr key={id}>
-                    <Td textAlign="center">{id}</Td>
+                    <Td>{name}</Td>
                     <Td textAlign="center">
-                      {status === shoppingStatus.PENDING && (
+                      {status === contractStatus.NEW && (
                         <Badge variant="outline" colorScheme="yellow">
-                          Pendiente
+                          Nuevo
                         </Badge>
                       )}
-                      {status === shoppingStatus.APPROVED && (
+                      {status === contractStatus.REQUESTED_CHANGES && (
+                        <Badge variant="outline" colorScheme="orange">
+                          Requiere cambios
+                        </Badge>
+                      )}
+                      {status === contractStatus.APPROVED && (
                         <Badge variant="outline" colorScheme="green">
                           Aprobado
                         </Badge>
                       )}
-                      {status === shoppingStatus.CANCELED && (
+                      {status === contractStatus.CANCELED && (
                         <Badge variant="outline" colorScheme="red">
                           Cancelada
                         </Badge>
                       )}
                     </Td>
                     <Td textAlign="center">
-                      {formatDate(deliveryAt, {
+                      {formatDate(createdAt, {
                         month: 'long',
                         day: 'numeric',
                       })}
                     </Td>
+                    <Td textAlign="center">
+                      {!!approvedAt &&
+                        formatDate(approvedAt, {
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      {!approvedAt && (
+                        <Text colorScheme="orange" color="orange.500">
+                          Pendiente
+                        </Text>
+                      )}
+                    </Td>
                     <Td textAlign="center">{`${firstname} ${lastname}`}</Td>
                     <Td textAlign="center">
-                      <Button
-                        colorScheme="blue"
-                        onClick={() => setShopping(shopping)}
-                      >
-                        <Icon as={TbChecklist} w="5" h="5" />
+                      <Button colorScheme="blue">
+                        <Icon as={TbFileText} w="5" h="5" />
                       </Button>
                     </Td>
                   </Tr>
@@ -176,7 +155,7 @@ export default function Shoppings({ data, user }) {
             size="sm"
             colorScheme="yellow"
             onClick={() =>
-              router.push(`/compras?page=${Math.max(data.page - 1, 1)}`)
+              router.push(`/contratos?page=${Math.max(data.page - 1, 1)}`)
             }
           >
             <Icon w="5" h="5" as={TbChevronLeft} />
@@ -190,7 +169,7 @@ export default function Shoppings({ data, user }) {
               colorScheme="yellow"
               key={`pagination-${page}`}
               disabled={data.page === page + 1}
-              onClick={() => router.push(`/compras?page=${page + 1}`)}
+              onClick={() => router.push(`/contratos?page=${page + 1}`)}
             >
               {page + 1}
             </Button>
@@ -203,7 +182,7 @@ export default function Shoppings({ data, user }) {
             colorScheme="yellow"
             onClick={() =>
               router.push(
-                `/compras?page=${Math.min(data.page + 1, data.pages)}`,
+                `/contratos?page=${Math.min(data.page + 1, data.pages)}`,
               )
             }
           >
@@ -229,7 +208,7 @@ export const getServerSideProps = async ({ req, query }) => {
 
   const page = query.page || 1
   const request = await fetcher(
-    `${process.env.BASE_URL}/api/shoppings?perPage=5&page=${page}`,
+    `${process.env.BASE_URL}/api/contracts?perPage=5&page=${page}`,
     {
       headers: {
         authorization: `Bearer ${user.token}`,
@@ -243,14 +222,14 @@ export const getServerSideProps = async ({ req, query }) => {
     props: {
       user: {
         ...user,
-        type: user.roles.shoppings,
+        type: user.roles.contracts,
       },
       data,
     },
   }
 }
 
-Shoppings.propTypes = {
+Contracts.propTypes = {
   user: PropTypes.shape({
     email: PropTypes.string,
     type: PropTypes.string,
@@ -260,11 +239,11 @@ Shoppings.propTypes = {
     page: PropTypes.number,
     pages: PropTypes.number,
     perPage: PropTypes.number,
-    shoppings: PropTypes.arrayOf(
+    contracts: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string,
         status: PropTypes.string,
-        deliveryAt: PropTypes.string,
+        createdAt: PropTypes.string,
         description: PropTypes.string,
         user: PropTypes.arrayOf(
           PropTypes.shape({
