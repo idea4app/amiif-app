@@ -1,20 +1,23 @@
 import PropTypes from 'prop-types'
 import {
-  Box,
+  Flex,
+  Icon,
+  List,
   Text,
   Modal,
   Button,
+  ListIcon,
+  ListItem,
   ModalBody,
   ModalFooter,
   ModalHeader,
   ModalContent,
   ModalOverlay,
   ModalCloseButton,
-  Icon,
-  Flex,
 } from '@chakra-ui/react'
 
 import { BsDot } from 'react-icons/bs'
+import { TbCheck, TbX } from 'react-icons/tb'
 
 import { shoppingStatus } from '/constants'
 
@@ -25,10 +28,9 @@ export default function ModalAddShopping({
   userType,
   onApprove,
 }) {
-  console.log({ description: shopping?.description })
   return (
     <Modal isOpen={isOpen} onClose={onClose} motionPreset="slideInBottom">
-      <ModalOverlay />
+      <ModalOverlay backdropFilter="blur(10px)" />
       <ModalContent>
         <ModalHeader>{shopping?.id}</ModalHeader>
         <ModalCloseButton />
@@ -36,18 +38,20 @@ export default function ModalAddShopping({
           <Text fontSize="md" mb="2">
             Conceptos:
           </Text>
-          <Box mt="4" mb="4">
+          <List mt="4" mb="4">
             {shopping?.description.split('\n').map(item => {
               return (
-                <Flex key={item} alignItems="center">
-                  <Icon as={BsDot} />
-                  <Text key={item} fontSize="md">
-                    {item}
-                  </Text>
-                </Flex>
+                <ListItem key={item}>
+                  <Flex alignItems="center">
+                    <ListIcon as={BsDot} w="10" h="10" />
+                    <Text key={item} fontSize="md">
+                      {item}
+                    </Text>
+                  </Flex>
+                </ListItem>
               )
             })}
-          </Box>
+          </List>
         </ModalBody>
         {userType === 'admin' && (
           <ModalFooter>
@@ -57,6 +61,7 @@ export default function ModalAddShopping({
               colorScheme="red"
               onClick={onApprove}
               data-action={shoppingStatus.CANCELED}
+              leftIcon={<Icon w="5" h="5" as={TbX} />}
             >
               Cancelar
             </Button>
@@ -64,6 +69,7 @@ export default function ModalAddShopping({
               colorScheme="green"
               onClick={onApprove}
               data-action={shoppingStatus.APPROVED}
+              leftIcon={<Icon w="5" h="5" as={TbCheck} />}
             >
               Aprobar
             </Button>

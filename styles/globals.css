@@ -1,10 +1,28 @@
-.calendar,
-.react-calendar__tile:disabled,
-.react-calendar__navigation button:disabled,
-.react-calendar__navigation button:enabled:hover,
-.react-calendar__navigation button:enabled:focus,
-.react-calendar__tile:enabled:hover,
-.react-calendar__tile:enabled:focus {
+.calendar {
   border: none !important;
-  /* background: transparent !important; */
+}
+
+.chakra-ui-dark .calendar,
+.chakra-ui-dark .react-calendar__tile:disabled,
+.chakra-ui-dark .react-calendar__navigation button:disabled {
+  background: #2c3748;
+}
+
+.chakra-ui-dark .react-calendar__tile:disabled {
+  text-decoration: line-through;
+}
+
+.chakra-ui-dark .react-calendar__tile:enabled:hover,
+.chakra-ui-dark .react-calendar__tile:enabled:focus,
+.chakra-ui-dark .react-calendar__navigation button:enabled:hover,
+.chakra-ui-dark .react-calendar__navigation button:enabled:focus {
+  background: #444a54;
+}
+
+.react-calendar__navigation button:disabled {
+  color: #fff;
+}
+
+.chakra-ui-dark .react-calendar__navigation button:disabled {
+  color: #2c3748;
 }

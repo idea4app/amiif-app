@@ -60,7 +60,7 @@ async function getAllShoppings(req, res) {
 }
 
 async function createShopping(req, res) {
-  const { _id, email, firstname, paternalSurname } = res.user
+  const { _id, email, firstname, lastname } = res.user
 
   // check deliveryAt not null
   if (!req.body.deliveryAt) {
@@ -88,10 +88,7 @@ async function createShopping(req, res) {
   }
 
   // check description not null
-  const description = (req.body.description || '')
-    .replace(/\n/, ',')
-    .replace(/\t/, ',')
-    .trim()
+  const description = (req.body.description || '').trim()
 
   if (!description) {
     return res.status(httpStatus.HTTP_400_BAD_REQUEST).json({
@@ -121,8 +118,8 @@ async function createShopping(req, res) {
     emailNotifier({
       email,
       notifyType: notifyTypes.SHOPPING,
+      name: `${firstname} ${lastname}`,
       subject: `Nueva order creada: ${id}`,
-      name: `${firstname} ${paternalSurname}`,
       variables: { status, deliveryAt, description },
     })
 
