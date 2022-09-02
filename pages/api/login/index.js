@@ -1,8 +1,8 @@
 import { serialize } from 'cookie'
 import { SHA256 } from 'crypto-js'
 
-import { httpStatus } from '/constants'
-import { createAccessToken } from '/utils'
+import { httpStatus } from '../../../constants'
+import { createAccessToken } from '../../../utils'
 
 import { mongoClient } from '/config/database'
 

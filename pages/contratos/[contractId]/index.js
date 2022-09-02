@@ -33,9 +33,9 @@ import {
 } from 'react-icons/tb'
 
 import Page from '../../../lib/page'
-import { contractStatus, httpStatus } from '../../../constants'
 import { fetcher, formatDate } from '../../../utils'
 import { getLoggedUser } from '../../../lib/session'
+import { contractStatus, httpStatus } from '../../../constants'
 
 export default function Contracts({ data = {}, user }) {
   const [{ firstname, lastname }] = data.user
@@ -82,7 +82,23 @@ export default function Contracts({ data = {}, user }) {
 
     const response = await request.json()
     data.documents = [response, ...data.documents]
+    data.lastVersion = response.version
     fileForm.reset()
+  }
+
+  async function onChangeStatus(event) {
+    const status = event.target.dataset.status
+    const request = await fetcher(`/api/contracts/${data.id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    })
+
+    if (request.status === httpStatus.HTTP_200_OK) {
+      window.location.reload()
+    }
   }
 
   return (
@@ -91,54 +107,54 @@ export default function Contracts({ data = {}, user }) {
         Detalle de contrato
       </Heading>
       <Flex mt="5" mb="5" justifyContent="space-between" alignItems="center">
-        {/* <Button
-          variant="solid"
-          colorScheme="green"
-          onClick={uploadContract.onOpen}
-          rightIcon={<Icon w="5" h="5" as={TbRefresh} />}
-        >
-          Actualizar versión
-        </Button> */}
         <Heading size="md">{data.name}</Heading>
-        <Menu>
-          <MenuButton
-            as={Button}
-            rightIcon={<Icon as={TbChevronDown} />}
-            colorScheme="blue"
-          >
-            Cambiar estado
-          </MenuButton>
-          <MenuList padding="10px">
-            <VStack>
-              <Button
-                w="100%"
-                colorScheme="green"
-                justifyContent="flex-start"
-                leftIcon={<Icon as={TbCheck} />}
-              >
-                Aprobar
-              </Button>
+        {user.roles.contracts === 'admin' && (
+          <Menu>
+            <MenuButton
+              as={Button}
+              rightIcon={<Icon as={TbChevronDown} />}
+              colorScheme="blue"
+            >
+              Cambiar estado
+            </MenuButton>
+            <MenuList padding="10px">
+              <VStack>
+                <Button
+                  w="100%"
+                  colorScheme="green"
+                  justifyContent="flex-start"
+                  onClick={onChangeStatus}
+                  leftIcon={<Icon as={TbCheck} />}
+                  data-status={contractStatus.APPROVED}
+                >
+                  Aprobar
+                </Button>
 
-              <Button
-                w="100%"
-                colorScheme="orange"
-                justifyContent="flex-start"
-                leftIcon={<Icon as={TbRepeat} />}
-              >
-                Requiere cambios
-              </Button>
+                <Button
+                  w="100%"
+                  colorScheme="orange"
+                  justifyContent="flex-start"
+                  onClick={onChangeStatus}
+                  leftIcon={<Icon as={TbRepeat} />}
+                  data-status={contractStatus.REQUESTED_CHANGES}
+                >
+                  Requiere cambios
+                </Button>
 
-              <Button
-                w="100%"
-                colorScheme="red"
-                justifyContent="flex-start"
-                leftIcon={<Icon as={TbX} />}
-              >
-                Cancelar
-              </Button>
-            </VStack>
-          </MenuList>
-        </Menu>
+                <Button
+                  w="100%"
+                  colorScheme="red"
+                  justifyContent="flex-start"
+                  onClick={onChangeStatus}
+                  leftIcon={<Icon as={TbX} />}
+                  data-status={contractStatus.CANCELED}
+                >
+                  Cancelar
+                </Button>
+              </VStack>
+            </MenuList>
+          </Menu>
+        )}
       </Flex>
       <Grid
         gridGap="4"
@@ -377,10 +393,7 @@ export const getServerSideProps = async ({ req, query }) => {
 
   return {
     props: {
-      user: {
-        ...user,
-        type: user.roles.contracts,
-      },
+      user,
       data,
     },
   }
@@ -391,6 +404,9 @@ Contracts.propTypes = {
     comment: PropTypes.string,
     type: PropTypes.string,
     token: PropTypes.string,
+    roles: PropTypes.shape({
+      contracts: PropTypes.string,
+    }),
   }),
   data: PropTypes.shape({
     id: PropTypes.string,
