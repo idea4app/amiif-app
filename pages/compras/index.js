@@ -111,7 +111,7 @@ export default function Shoppings({ data, user }) {
           Crear order
         </Button>
       </Flex>
-      <Box mt="6" borderWidth="3px" rounded="lg" minHeight="410px">
+      <Box mt="6" minHeight="410px">
         <TableContainer>
           <Table variant="striped" colorScheme="gray">
             <Thead>
