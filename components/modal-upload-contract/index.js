@@ -17,7 +17,7 @@ import {
   ModalCloseButton,
   InputLeftElement,
 } from '@chakra-ui/react'
-import { TbPencil, TbBallpen, TbCloudUpload } from 'react-icons/tb'
+import { TbPencil, TbCloudUpload } from 'react-icons/tb'
 
 import { httpStatus } from '../../constants'
 

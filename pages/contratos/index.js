@@ -1,3 +1,4 @@
+import NextLink from 'next/link'
 import PropTypes from 'prop-types'
 import { useRouter } from 'next/router'
 import {
@@ -137,9 +138,11 @@ export default function Contracts({ data = {}, user }) {
                     </Td>
                     <Td textAlign="center">{`${firstname} ${lastname}`}</Td>
                     <Td textAlign="center">
-                      <Button colorScheme="blue">
-                        <Icon as={TbFileText} w="5" h="5" />
-                      </Button>
+                      <NextLink href={`/contratos/${id}`} passHref>
+                        <Button data-contract={id} colorScheme="blue">
+                          <Icon as={TbFileText} w="5" h="5" />
+                        </Button>
+                      </NextLink>
                     </Td>
                   </Tr>
                 )

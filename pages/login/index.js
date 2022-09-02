@@ -19,7 +19,7 @@ import {
   InputLeftElement,
   useColorModeValue,
 } from '@chakra-ui/react'
-import { TbMail, TbLock, TbLogin } from 'react-icons/tb'
+import { TbMail, TbLock } from 'react-icons/tb'
 
 import { fetcher } from '/utils'
 import { httpStatus } from '/constants'
