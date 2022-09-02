@@ -3,7 +3,7 @@ import { Storage } from '@google-cloud/storage'
 
 import { verifyAccessToken } from '/utils'
 import { mongoClient } from '/config/database'
-import { httpStatus, contractStatus } from '../../../constants'
+import { httpStatus, contractStatus } from '../../../../constants'
 
 const {
   SECRET_KEY,
@@ -25,7 +25,7 @@ const gcpStorage = new Storage({
 
 const bucket = gcpStorage.bucket(GOOGLE_BUCKET_NAME)
 
-async function createContract(req, res) {
+async function updateContract(req, res) {
   const form = new formidable.IncomingForm()
 
   form.parse(req, async (error, fields, files) => {
@@ -90,23 +90,15 @@ async function createContract(req, res) {
   })
 }
 
-async function getAllContracts(req, res) {
+async function getContract(req, res) {
   try {
-    const { _id, roles } = res.user
-    const page = Number(req.query.page || 10)
-    const perPage = Number(req.query.perPage || 10)
-
-    const skip = (page - 1) * perPage
+    const { contractId } = req.query
 
     const db = await mongoClient()
     const collection = await db.collection('contracts')
-    const query = (roles.contracts !== 'admin' && { user: _id }) || {}
-
-    const contracts = await collection
+    const [contract] = await collection
       .aggregate([
-        { $match: query },
-        { $skip: skip },
-        { $limit: perPage },
+        { $match: { id: contractId } },
         { $project: { _id: 0 } },
         {
           $lookup: {
@@ -127,15 +119,7 @@ async function getAllContracts(req, res) {
       ])
       .toArray()
 
-    const docs = await collection.count(query)
-    const pages = Math.ceil(docs / perPage)
-
-    return res.status(httpStatus.HTTP_200_OK).json({
-      page,
-      pages,
-      perPage,
-      contracts,
-    })
+    return res.status(httpStatus.HTTP_200_OK).json(contract)
   } catch (error) {
     console.error(error)
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
@@ -167,10 +151,10 @@ export default async function handler(req, res) {
 
   const { method } = req
 
-  if (method === 'POST') {
-    return createContract(req, res)
+  if (method === 'PUT') {
+    return updateContract(req, res)
   } else if (method === 'GET') {
-    return getAllContracts(req, res)
+    return getContract(req, res)
   }
 
   return res.status(httpStatus.HTTP_501_NOT_IMPLEMENTED).json({
