@@ -32,6 +32,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+COPY --from=builder --chown=nextjs:nodejs /app/anet-amiif-93c94bcf2307.json ./
+
 USER nextjs
 
 EXPOSE 3000
