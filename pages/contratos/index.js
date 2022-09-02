@@ -46,10 +46,10 @@ export default function Contracts({ data = {}, user }) {
   ]
 
   function handleOnCreate(contractData) {
-    if (data.page === data.pages) {
-      data.pages += 1
-    } else if (data.contracts.length < data.perPage) {
+    if (data.contracts.length < data.perPage) {
       data.contracts = [...data.contracts, contractData]
+    } else if (data.page === data.pages) {
+      data.pages += 1
     }
 
     uploadContract.onClose()
@@ -73,7 +73,7 @@ export default function Contracts({ data = {}, user }) {
           Subir contrato
         </Button>
       </Flex>
-      <Box mt="6" borderWidth="3px" rounded="lg" minHeight="410px">
+      <Box mt="6" minHeight="410px">
         <TableContainer>
           <Table variant="striped" colorScheme="gray">
             <Thead>
@@ -223,10 +223,7 @@ export const getServerSideProps = async ({ req, query }) => {
 
   return {
     props: {
-      user: {
-        ...user,
-        type: user.roles.contracts,
-      },
+      user,
       data,
     },
   }
