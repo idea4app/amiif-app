@@ -8,6 +8,7 @@ import {
   Button,
   ListIcon,
   ListItem,
+  useToast,
   ModalBody,
   ModalFooter,
   ModalHeader,
@@ -19,15 +20,52 @@ import {
 import { BsDot } from 'react-icons/bs'
 import { TbCheck, TbX } from 'react-icons/tb'
 
-import { shoppingStatus } from '/constants'
+import { fetcher } from '../../utils'
+import { httpStatus, shoppingStatus } from '../../constants'
 
 export default function ModalAddShopping({
+  user,
   isOpen,
   onClose,
+  onUpdate,
   shopping,
-  userType,
-  onApprove,
 }) {
+  const toast = useToast()
+
+  async function handleApprove(status) {
+    const request = await fetcher(`/api/shoppings/${shopping.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    })
+
+    if (request.status !== httpStatus.HTTP_200_OK) {
+      return toast({
+        status: 'error',
+        title: 'Error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+        description: 'Ocurrió un error al actualizar, intenta nuevamente',
+      })
+    }
+
+    const response = await request.json()
+    onUpdate(response)
+    onClose()
+
+    return toast({
+      duration: 3000,
+      isClosable: true,
+      status: 'success',
+      title: 'Actualizada',
+      position: 'top-right',
+      description: 'Se ha actualizado el estado de la compra',
+    })
+  }
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} motionPreset="slideInBottom">
       <ModalOverlay backdropFilter="blur(10px)" />
@@ -53,23 +91,21 @@ export default function ModalAddShopping({
             })}
           </List>
         </ModalBody>
-        {userType === 'admin' && (
+        {user.roles.shoppings === 'admin' && (
           <ModalFooter>
             <Button
               mr={3}
               variant="ghost"
               colorScheme="red"
-              onClick={onApprove}
-              data-action={shoppingStatus.CANCELED}
               leftIcon={<Icon w="5" h="5" as={TbX} />}
+              onClick={() => handleApprove(shoppingStatus.CANCELED)}
             >
               Cancelar
             </Button>
             <Button
               colorScheme="green"
-              onClick={onApprove}
-              data-action={shoppingStatus.APPROVED}
               leftIcon={<Icon w="5" h="5" as={TbCheck} />}
+              onClick={() => handleApprove(shoppingStatus.APPROVED)}
             >
               Aprobar
             </Button>
@@ -83,10 +119,16 @@ export default function ModalAddShopping({
 ModalAddShopping.propTypes = {
   isOpen: PropTypes.bool,
   onClose: PropTypes.func,
+  onUpdate: PropTypes.func,
   onApprove: PropTypes.func,
   shopping: PropTypes.shape({
     id: PropTypes.string,
     description: PropTypes.string,
   }),
-  userType: PropTypes.string,
+  user: PropTypes.shape({
+    token: PropTypes.string,
+    roles: PropTypes.shape({
+      shoppings: PropTypes.string,
+    }),
+  }),
 }

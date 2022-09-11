@@ -90,9 +90,9 @@ export default function Contracts({ data = {}, user }) {
             </Thead>
             <Tbody>
               {(data.contracts || []).map(contract => {
-                const { id, name, status, user, createdAt, approvedAt } =
+                const { id, name, status, creator, createdAt, approvedAt } =
                   contract
-                const [{ firstname, lastname }] = user
+                const { firstname, lastname } = creator
                 return (
                   <Tr key={id}>
                     <Td>{name}</Td>

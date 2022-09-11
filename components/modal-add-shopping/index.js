@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
+import { useForm } from 'react-hook-form'
 import {
   Flex,
   Icon,
@@ -7,6 +8,7 @@ import {
   Modal,
   Button,
   Textarea,
+  useToast,
   ModalBody,
   ModalFooter,
   ModalHeader,
@@ -17,35 +19,56 @@ import {
 import Calendar from 'react-calendar'
 import { TbCheck } from 'react-icons/tb'
 
+import { fetcher } from '../../utils'
+import { httpStatus } from '../../constants'
+
 import 'react-calendar/dist/Calendar.css'
 
-export default function ModalAddShopping({ isOpen, onClose, onCreate }) {
-  const [error, setError] = useState('')
-  const [description, setDescription] = useState('')
+export default function ModalAddShopping({ user, isOpen, onClose, onCreate }) {
+  const toast = useToast()
+  const { handleSubmit, register, reset } = useForm()
   const [deliveryAt, setDeliveryAt] = useState(new Date())
 
-  async function handleCreate(event) {
-    event.preventDefault()
-
-    const success = await onCreate({
-      description,
-      deliveryAt: deliveryAt.toISOString(),
+  async function handleCreate({ description }) {
+    const request = await fetcher('/api/shoppings', {
+      method: 'POST',
+      body: JSON.stringify({ description, deliveryAt }),
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
     })
 
-    if (success) {
-      setDescription('')
-      setDeliveryAt(new Date())
-      return onClose()
+    if (request.status !== httpStatus.HTTP_201_CREATED) {
+      return toast({
+        status: 'error',
+        title: 'Error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+        description: 'Ocurrió un error al crear la órden, intenta nuevamente',
+      })
     }
 
-    setError('La fecha debe ser mayor a la fecha actual')
+    const response = await request.json()
+    onCreate(response)
+
+    toast({
+      duration: 3000,
+      isClosable: true,
+      status: 'success',
+      title: 'Creada',
+      position: 'top-right',
+      description: 'Se ha creado correctamente',
+    })
+    onClose()
+    reset()
   }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} motionPreset="slideInBottom">
       <ModalOverlay backdropFilter="blur(10px)" />
       <ModalContent>
-        <form onSubmit={handleCreate}>
+        <form onSubmit={handleSubmit(handleCreate)}>
           <ModalHeader>Crear orden de compra</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -58,26 +81,18 @@ export default function ModalAddShopping({ isOpen, onClose, onCreate }) {
               />
             </Flex>
             <Text fontSize="md" mb="2">
-              Descripción
+              Artículos:
             </Text>
             <Textarea
               required
               minHeight="200px"
               borderWidth="2px"
-              value={description}
               borderColor="blue.400"
               placeholder="Conceptos separados por saltos de línea"
-              onChange={e => setDescription(e.target.value)}
+              {...register('description', {
+                required: 'Artículos requeridos',
+              })}
             />
-            <Text
-              mt="1"
-              mb="1"
-              fontSize="sm"
-              color="red.500"
-              textAlign="center"
-            >
-              {error}
-            </Text>
           </ModalBody>
           <ModalFooter>
             <Button
@@ -98,4 +113,7 @@ ModalAddShopping.propTypes = {
   isOpen: PropTypes.bool,
   onClose: PropTypes.func,
   onCreate: PropTypes.func,
+  user: PropTypes.shape({
+    token: PropTypes.string,
+  }),
 }

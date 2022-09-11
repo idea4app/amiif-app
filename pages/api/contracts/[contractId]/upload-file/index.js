@@ -1,7 +1,6 @@
 import handler from '/server/handlers/protected'
 import multer from '/server/middlewares/multer'
-import getContracts from '/server/contracts/getContracts'
-import createContract from '/server/contracts/createContract'
+import uploadContract from '/server/contracts/uploadContract'
 
 export const config = {
   api: {
@@ -9,8 +8,7 @@ export const config = {
   },
 }
 
-handler.get(getContracts)
 handler.use(multer)
-handler.post(createContract)
+handler.put(uploadContract)
 
 export default handler

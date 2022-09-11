@@ -1,20 +1,8 @@
-import nextConnect from 'next-connect'
+import mongoClient from '../databases/mongodb'
+import gsUploader from '../../lib/gs-uploader'
+import { httpStatus } from '../../constants'
 
-import { httpStatus } from '../../../../../constants'
-import gsUploader from '../../../../../lib/gs-uploader'
-import { mongoClient } from '../../../../../config/database'
-import {
-  validateSession,
-  multerMiddleware,
-} from '../../../../../lib/middlewares'
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
-
-async function updateFile(req, res) {
+export default async function uploadContract(req, res) {
   try {
     const { contractId } = req.query
     const db = await mongoClient()
@@ -55,18 +43,3 @@ async function updateFile(req, res) {
     })
   }
 }
-
-const handler = nextConnect({
-  onError: (error, req, res, next) => {
-    if (error) {
-      return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
-        error: error.message,
-      })
-    }
-  },
-})
-handler.use(validateSession)
-handler.use(multerMiddleware)
-handler.put(updateFile)
-
-export default handler

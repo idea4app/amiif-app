@@ -29,8 +29,9 @@ import { getLoggedUser } from '/lib/session'
 
 export default function Shoppings({ data, user }) {
   const router = useRouter()
+  const updateModal = useDisclosure()
+  const createModal = useDisclosure()
   const [shopping, setShopping] = useState(null)
-  const { isOpen, onClose, onOpen } = useDisclosure()
 
   const columns = [
     { name: 'No. Order', id: 'id' },
@@ -40,72 +41,44 @@ export default function Shoppings({ data, user }) {
     { name: 'Visualizar', id: 'actions' },
   ]
 
-  async function handleApprove(event) {
-    const action = event.target.dataset.action
-    const request = await fetcher(`/api/shoppings/check/${shopping.id}`, {
-      method: 'PUT',
-      body: JSON.stringify({ action }),
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    })
+  function handleSelectShopping(shoppingId) {
+    const shopping = data.shoppings.find(({ id }) => id === shoppingId)
+    setShopping(shopping)
+    updateModal.onOpen()
+  }
 
-    const response = await request.json()
-    const newStatus = response.status
-
+  function handleUpdate(shoppingUpdated) {
     data.shoppings = data.shoppings.map(shopping => {
-      if (shopping.id === response.id) {
-        shopping.status = newStatus
+      if (shopping.id === shoppingUpdated.id) {
+        shopping.status = shoppingUpdated.status
       }
       return shopping
     })
-
-    setShopping(null)
   }
 
-  async function handleAddShopping({ description, deliveryAt }) {
-    const request = await fetcher('/api/shoppings', {
-      method: 'POST',
-      body: JSON.stringify({ description, deliveryAt }),
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    })
-
-    if (request.status !== httpStatus.HTTP_201_CREATED) {
-      return false
-    }
-
+  function handleCreate(shopping) {
     if (data.shoppings.length < data.perPage) {
-      const response = await request.json()
-      data.shoppings = [...data.shoppings, response]
+      data.shoppings = [...data.shoppings, shopping]
     } else if (data.pages === data.page) {
       data.pages += 1
     }
-
-    return true
   }
 
   return (
     <Page user={user}>
       <ModalActionShopping
-        userType={user.type}
-        isOpen={!!shopping}
+        {...updateModal}
+        user={user}
         shopping={shopping}
-        onApprove={handleApprove}
-        onClose={() => setShopping(null)}
+        onUpdate={handleUpdate}
       />
-      <ModalAddShopping
-        isOpen={isOpen}
-        onClose={onClose}
-        onCreate={handleAddShopping}
-      />
+      <ModalAddShopping {...createModal} user={user} onCreate={handleCreate} />
       <Flex mt="5" justifyContent="space-between">
         <Heading size="lg">Compras</Heading>
         <Button
           variant="solid"
-          onClick={onOpen}
           colorScheme="green"
+          onClick={createModal.onOpen}
           rightIcon={<Icon w="5" h="5" as={TbChecklist} />}
         >
           Crear order
@@ -124,9 +97,7 @@ export default function Shoppings({ data, user }) {
               </Tr>
             </Thead>
             <Tbody>
-              {data.shoppings.map(shopping => {
-                const { id, status, user, deliveryAt } = shopping
-                const [{ firstname, lastname }] = user
+              {data.shoppings.map(({ id, status, creator, deliveryAt }) => {
                 return (
                   <Tr key={id}>
                     <Td textAlign="center">{id}</Td>
@@ -153,11 +124,14 @@ export default function Shoppings({ data, user }) {
                         day: 'numeric',
                       })}
                     </Td>
-                    <Td textAlign="center">{`${firstname} ${lastname}`}</Td>
+                    <Td textAlign="center">
+                      {`${creator?.firstname} ${creator?.lastname}`}
+                    </Td>
                     <Td textAlign="center">
                       <Button
                         colorScheme="blue"
-                        onClick={() => setShopping(shopping)}
+                        data-shopping-id={id}
+                        onClick={() => handleSelectShopping(id)}
                       >
                         <Icon as={TbChecklist} w="5" h="5" />
                       </Button>
@@ -266,13 +240,10 @@ Shoppings.propTypes = {
         status: PropTypes.string,
         deliveryAt: PropTypes.string,
         description: PropTypes.string,
-        user: PropTypes.arrayOf(
-          PropTypes.shape({
-            firstname: PropTypes.string,
-            maternalSurname: PropTypes.string,
-            lastname: PropTypes.string,
-          }),
-        ),
+        creator: PropTypes.shape({
+          firstname: PropTypes.string,
+          lastname: PropTypes.string,
+        }),
       }),
     ),
   }),

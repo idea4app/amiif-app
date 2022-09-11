@@ -6,21 +6,21 @@ import {
   Flex,
   Grid,
   Icon,
+  Menu,
   Text,
+  Badge,
+  Input,
+  Avatar,
+  VStack,
   Button,
   Heading,
-  Menu,
-  MenuButton,
   MenuList,
-  VStack,
-  Badge,
-  FormControl,
   FormLabel,
   InputGroup,
-  Input,
-  InputLeftElement,
+  MenuButton,
+  FormControl,
   FormErrorMessage,
-  Avatar,
+  InputLeftElement,
 } from '@chakra-ui/react'
 import {
   TbX,
@@ -38,7 +38,7 @@ import { getLoggedUser } from '../../../lib/session'
 import { contractStatus, httpStatus } from '../../../constants'
 
 export default function Contracts({ data = {}, user }) {
-  const [{ firstname, lastname }] = data.user
+  const { firstname, lastname } = data.creator
 
   const fileForm = useForm()
   const commentForm = useForm()
@@ -63,11 +63,11 @@ export default function Contracts({ data = {}, user }) {
     return commentForm.reset()
   }
 
-  async function onUpdateFile({ file }) {
+  async function onUploadFile({ file }) {
     const formData = new FormData()
     formData.append('file', file[0])
 
-    const request = await fetch(`/api/contracts/${data.id}/update-file`, {
+    const request = await fetch(`/api/contracts/${data.id}/upload-file`, {
       method: 'PUT',
       body: formData,
       headers: { Authorization: `Bearer ${user.token}` },
@@ -158,10 +158,11 @@ export default function Contracts({ data = {}, user }) {
       </Flex>
       <Grid
         gridGap="4"
-        padding="20px 0"
+        rounded="lg"
+        padding="20px"
+        boxShadow="md"
+        borderWidth="2px"
         alignItems="center"
-        borderTopWidth="2px"
-        borderBottomWidth="2px"
         templateColumns="repeat(3, 1fr)"
       >
         <Box>
@@ -302,7 +303,7 @@ export default function Contracts({ data = {}, user }) {
             Historial de archivos
           </Heading>
           <Box borderTopWidth="2px" mt="6" pt="6">
-            <form onSubmit={fileForm.handleSubmit(onUpdateFile)}>
+            <form onSubmit={fileForm.handleSubmit(onUploadFile)}>
               <FormControl mb="6" isInvalid={fileForm.formState.errors.file}>
                 <FormLabel htmlFor="file">Subir nuevo contrato</FormLabel>
                 <InputGroup>
