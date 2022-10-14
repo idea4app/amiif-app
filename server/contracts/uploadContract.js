@@ -19,7 +19,7 @@ export default async function uploadContract(req, res) {
       const newDocument = {
         version,
         fileName,
-        remotePath,
+        remotePath: `${process.env.GOOGLE_CLOUD_STORAGE_BASE}/${process.env.CONTRACTS_FOLDER}/${fileName}`,
       }
 
       const updatedDocuments = [newDocument, ...documents]

@@ -332,32 +332,46 @@ export default function Contracts({ data = {}, user }) {
             </form>
           </Box>
           <Flex mt="4" flexDirection="column" justifyContent="flex-start">
-            {data.documents.map(({ fileName, version }) => {
+            {data.documents.map(({ fileName, version, remotePath }) => {
               return (
-                <Flex
-                  mb="3"
-                  padding="2"
-                  rounded="md"
-                  key={version}
-                  borderWidth="2px"
-                  alignItems="center"
-                  borderColor="red.400"
-                  justifyContent="space-between"
+                <a
+                  target="_blank"
+                  key={fileName}
+                  alt={fileName}
+                  rel="noreferrer"
+                  href={remotePath}
                 >
-                  <Flex alignItems="center">
-                    <Icon w="7" h="7" as={TbFileText} color="red.500" mr="2" />
-                    <Text fontSize="sm" fontWeight="bold">
-                      {fileName}
-                    </Text>
+                  <Flex
+                    mb="3"
+                    padding="2"
+                    rounded="md"
+                    key={version}
+                    borderWidth="2px"
+                    alignItems="center"
+                    borderColor="red.400"
+                    justifyContent="space-between"
+                  >
+                    <Flex alignItems="center">
+                      <Icon
+                        w="7"
+                        h="7"
+                        as={TbFileText}
+                        color="red.500"
+                        mr="2"
+                      />
+                      <Text fontSize="sm" fontWeight="bold">
+                        {fileName}
+                      </Text>
+                    </Flex>
+                    <Icon
+                      w="7"
+                      h="7"
+                      mr="2"
+                      color="blue.500"
+                      as={TbExternalLink}
+                    />
                   </Flex>
-                  <Icon
-                    w="7"
-                    h="7"
-                    mr="2"
-                    color="blue.500"
-                    as={TbExternalLink}
-                  />
-                </Flex>
+                </a>
               )
             })}
           </Flex>
