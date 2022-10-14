@@ -20,7 +20,7 @@ export default async function createContract(req, res) {
         {
           fileName,
           version: 1,
-          remotePath,
+          remotePath: `${process.env.GOOGLE_CLOUD_STORAGE_BASE}/${process.env.CONTRACTS_FOLDER}/${fileName}`,
         },
       ]
 
