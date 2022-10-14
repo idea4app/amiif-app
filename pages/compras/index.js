@@ -23,7 +23,7 @@ import ModalAddShopping from '/components/modal-add-shopping'
 import ModalActionShopping from '/components/modal-action-shopping'
 
 import Page from '/lib/page'
-import { shoppingStatus, httpStatus } from '/constants'
+import { shoppingStatus } from '/constants'
 import { fetcher, formatDate } from '/utils'
 import { getLoggedUser } from '/lib/session'
 
