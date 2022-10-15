@@ -38,7 +38,8 @@ import { getLoggedUser } from '../../../lib/session'
 import { contractStatus, httpStatus } from '../../../constants'
 
 export default function Contracts({ data = {}, user }) {
-  const { firstname, lastname } = data.creator
+  const firstname = data?.creator?.firstname
+  const lastname = data?.creator?.lastname
 
   const fileForm = useForm()
   const commentForm = useForm()
@@ -268,7 +269,7 @@ export default function Contracts({ data = {}, user }) {
             </form>
           </Box>
           <Flex mt="4" flexDirection="column" justifyContent="flex-start">
-            {data.comments.map(comment => {
+            {(data?.comments || []).map(comment => {
               return (
                 <Flex
                   mb="3"
@@ -332,48 +333,50 @@ export default function Contracts({ data = {}, user }) {
             </form>
           </Box>
           <Flex mt="4" flexDirection="column" justifyContent="flex-start">
-            {data.documents.map(({ fileName, version, remotePath }) => {
-              return (
-                <a
-                  target="_blank"
-                  key={fileName}
-                  alt={fileName}
-                  rel="noreferrer"
-                  href={remotePath}
-                >
-                  <Flex
-                    mb="3"
-                    padding="2"
-                    rounded="md"
-                    key={version}
-                    borderWidth="2px"
-                    alignItems="center"
-                    borderColor="red.400"
-                    justifyContent="space-between"
+            {(data?.documents || []).map(
+              ({ fileName, version, remotePath }) => {
+                return (
+                  <a
+                    target="_blank"
+                    key={fileName}
+                    alt={fileName}
+                    rel="noreferrer"
+                    href={remotePath}
                   >
-                    <Flex alignItems="center">
+                    <Flex
+                      mb="3"
+                      padding="2"
+                      rounded="md"
+                      key={version}
+                      borderWidth="2px"
+                      alignItems="center"
+                      borderColor="red.400"
+                      justifyContent="space-between"
+                    >
+                      <Flex alignItems="center">
+                        <Icon
+                          w="7"
+                          h="7"
+                          as={TbFileText}
+                          color="red.500"
+                          mr="2"
+                        />
+                        <Text fontSize="sm" fontWeight="bold">
+                          {fileName}
+                        </Text>
+                      </Flex>
                       <Icon
                         w="7"
                         h="7"
-                        as={TbFileText}
-                        color="red.500"
                         mr="2"
+                        color="blue.500"
+                        as={TbExternalLink}
                       />
-                      <Text fontSize="sm" fontWeight="bold">
-                        {fileName}
-                      </Text>
                     </Flex>
-                    <Icon
-                      w="7"
-                      h="7"
-                      mr="2"
-                      color="blue.500"
-                      as={TbExternalLink}
-                    />
-                  </Flex>
-                </a>
-              )
-            })}
+                  </a>
+                )
+              },
+            )}
           </Flex>
         </Flex>
       </Grid>

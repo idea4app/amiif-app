@@ -34,7 +34,8 @@ export default async function session(req, res, next) {
 
     return next()
   } catch (error) {
-    console.error(error.message)
+    console.log(error.message)
+
     return res.status(httpStatus.HTTP_403_FORBIDDEN).json({
       error: 'Authentication Required',
     })

@@ -31,6 +31,8 @@ export default async function createComment(req, res) {
 
     return res.status(httpStatus.HTTP_201_CREATED).json(newComment)
   } catch (error) {
+    console.log(error.message)
+
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
       error: error.message,
     })
