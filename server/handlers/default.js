@@ -3,7 +3,7 @@ import { httpStatus } from '../../constants'
 
 export default nextConnect({
   onError: (err, _, res, __) => {
-    console.error(err.stack)
+    console.log(err.stack)
     return res
       .status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR)
       .end('Internal Server Error')

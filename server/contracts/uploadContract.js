@@ -37,7 +37,8 @@ export default async function uploadContract(req, res) {
       return res.status(httpStatus.HTTP_201_CREATED).json(newDocument)
     })
   } catch (error) {
-    console.error(error)
+    console.log(error.message)
+
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
       error: 'Internal Server Error',
     })

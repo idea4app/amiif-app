@@ -45,9 +45,11 @@ export default async function getContract(req, res) {
 
     return res.status(httpStatus.HTTP_200_OK).json(contract)
   } catch (error) {
-    console.error(error)
+    console.log(error)
+
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
       error: 'Internal Server Error',
+      detail: error,
     })
   }
 }

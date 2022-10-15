@@ -50,11 +50,11 @@ export default async function emailNotifier(_, res) {
       //   .request(sendData)
       // request
       //   .then(result => console.log(JSON.stringify(result.body, null, 2)))
-      //   .then(console.error)
+      //   .then(console.log)
     }
 
     console.log(JSON.stringify(sendData, null, 0))
   } catch (error) {
-    console.error(error.message)
+    console.log(error.message)
   }
 }

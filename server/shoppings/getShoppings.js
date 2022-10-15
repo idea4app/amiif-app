@@ -58,10 +58,11 @@ export default async function getAllShoppings(req, res) {
       page,
       pages,
       perPage,
-      shoppings,
+      shoppings: shoppings || [],
     })
   } catch (error) {
-    console.error(error)
+    console.log(error.message)
+
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
       error: 'Internal Server Error',
     })

@@ -20,7 +20,7 @@ export function verifyAccessToken({ token, secretKey }) {
 
     return tokenData
   } catch (error) {
-    console.error(error)
+    console.log(error.message)
     return null
   }
 }

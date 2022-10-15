@@ -21,7 +21,8 @@ export default async function updateStatus(req, res) {
       status,
     })
   } catch (error) {
-    console.error(error)
+    console.log(error.message)
+
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
       error: 'Internal Server Error',
     })

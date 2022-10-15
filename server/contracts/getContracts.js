@@ -61,7 +61,8 @@ export default async function getContracts(req, res) {
       contracts,
     })
   } catch (error) {
-    console.error(error)
+    console.log(error.message)
+
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
       error: 'Internal Server Error',
     })
