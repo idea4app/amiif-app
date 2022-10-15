@@ -29,7 +29,7 @@ export default async function updateShopping(req, res, next) {
 
     return res.status(httpStatus.HTTP_200_OK).json({ ...value, status })
   } catch (error) {
-    console.log(error.message)
+    console.log(error)
 
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
       error: 'Something went wrong',

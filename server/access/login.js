@@ -48,7 +48,7 @@ export default async function login(req, res) {
         tokenType: 'Bearer',
       })
   } catch (error) {
-    console.log(error.message)
+    console.log(error)
 
     return res.status(httpStatus.HTTP_500_INTERNAL_SERVER_ERROR).json({
       error: 'something went wrong',

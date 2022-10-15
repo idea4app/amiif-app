@@ -55,6 +55,6 @@ export default async function emailNotifier(_, res) {
 
     console.log(JSON.stringify(sendData, null, 0))
   } catch (error) {
-    console.log(error.message)
+    console.log(error)
   }
 }
